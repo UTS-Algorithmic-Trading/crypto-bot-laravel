@@ -34,7 +34,7 @@
                                         <a class="btn btn-secondary" href="{{ route('bots.show', $bot->id) }}">View</a>
                                         <a class="btn btn-primary" href="{{ route('bots.edit', $bot->id) }}">Edit</a>
                                     </div>
-                                    <a class="btn btn-danger" id="deleteBtn" data-deleteme="{{ $bot->id }}" href="#">Delete</a>
+                                    <a class="btn btn-danger" id="deleteBtn" data-deleteme="{{ '/bots/'.$bot->id }}" href="#">Delete</a>
                                 </td>
                                 <td>{{ $bot->name }}</td>
                                 <td>{{ $bot->stock_type }}</td>

@@ -94,7 +94,15 @@ class BotController extends Controller
      */
     public function update(Request $request, Bot $bot)
     {
-        //
+        $validator = Validator::make($request->all(), Bot::rules($bot->id));
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $bot->update($validator->valid());
+
+        return redirect('bots/'.$bot->id)->with('success', 'Successfully updated bot');
     }
 
     /**
@@ -113,7 +121,13 @@ class BotController extends Controller
         {
             return back()->withErrors($e->getMessage())->withInput();
         }
-        return redirect('index')->with('success', 'Bot Deleted');
+
+        request()->session()->flash('success', 'Bot Deleted');
+
+        return response()->json([
+            'status' => 'OK',
+            'message' => 'Bot Deleted',
+        ]);
 
     }
 }

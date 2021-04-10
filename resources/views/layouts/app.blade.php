@@ -118,16 +118,23 @@
                     return;
                 }
                 console.log("Attempting delete of: "+id);
-                let token   = $('meta[name="csrf-token"]').attr('content');
+                let token  = $('meta[name="csrf-token"]').attr('content');
                 console.log('CSRF Token: '+token);
 
                 $.ajax({
                     type: 'DELETE',
-                    url: '/bots/'+id,
+                    url: id,
                     data: {
                         _token: token,
                         _method: 'DELETE',
                     },
+                    success: function() {
+                        console.log('Successfully deleted item');
+                        let parts = id.split('/');
+                        console.log('Root part is: '+parts[1]);
+                        console.log('Redirecting to: '+window.location.href.replace(id, parts[1]));
+                        window.location.href = parts[1];
+                    }
                 })
 
             });

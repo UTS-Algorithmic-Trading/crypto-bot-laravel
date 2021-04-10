@@ -74,12 +74,65 @@
 
         </div>
 
+        {{-- Delete modal --}}
+        <div class="d-flex justify-content-center align-items-center w-100">
+            <div id="deleteModal" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+                <div class="toast-body">
+                    Are you sure you want to delete this item?
+                    <div class="mt-2 pt-2 border-top">
+                        <button type="button" class="btn btn-primary btn-sm" id="close-delete-modal-btn"  data-dismiss="toast">Close</button>
+                        <button type="button" class="btn btn-danger btn-sm" id="do-delete-modal-btn" data-deleteme="none">Yes, delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Scripts --}}
         <script src="{{ mix('/js/app.js') }}"></script>
 
         @if(config('settings.googleMapsAPIStatus'))
             {!! HTML::script('//maps.googleapis.com/maps/api/js?key='.config("settings.googleMapsAPIKey").'&libraries=places&dummy=.js', array('type' => 'text/javascript')) !!}
         @endif
+
+        <script type="text/javascript">
+        $(document).ready(function () {
+            $('#close-delete-modal-btn').click(function () {
+                console.log("Resetting delete modal");
+                $(this).data('deleteme', "none");
+            });
+
+
+            $('#deleteBtn').click(function () {
+                console.log("Opening delete modal");
+                let id = $(this).data('deleteme');
+                console.log('Settimng deleteme to: '+id);
+                $('#do-delete-modal-btn').data('deleteme', id);
+                $('#deleteModal').toast('show');
+
+            });
+            $('#do-delete-modal-btn').click(function () {
+                let id = $(this).data('deleteme');
+                if (id === "none")
+                {
+                    console.log("Skipping delete of: "+id);
+                    return;
+                }
+                console.log("Attempting delete of: "+id);
+                let token   = $('meta[name="csrf-token"]').attr('content');
+                console.log('CSRF Token: '+token);
+
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/bots/'+id,
+                    data: {
+                        _token: token,
+                        _method: 'DELETE',
+                    },
+                })
+
+            });
+        });
+        </script>
 
         @yield('footer_scripts')
 

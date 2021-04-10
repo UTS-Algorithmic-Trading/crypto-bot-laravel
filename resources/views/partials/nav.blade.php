@@ -58,6 +58,14 @@
                         </div>
                     </li>
                 @endrole
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('bots.index')}}">Bots</a>
+                </li>
+                @role('admin')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('bots.index')}}">Data</a>
+                </li>
+                @endrole
             </ul>
             {{-- Right Side Of Navbar --}}
             <ul class="navbar-nav ml-auto">

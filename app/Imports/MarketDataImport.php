@@ -7,8 +7,9 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, SkipsOnError
+class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, WithChunkReading, SkipsOnError
 {
     public $exchange = 1;
     private $rows = 0;
@@ -43,6 +44,11 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, Ski
         return 1000;
     }
 
+    public function chunkSize(): int
+    {
+        return 1000;
+    }
+
         /**
      * @param \Throwable $e
      */
@@ -51,7 +57,9 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, Ski
         // We don't do anything on errors
         // these are expected to be duplicate DB records, enforced by a unique index
         // composited on symbol and date columns. This is until we can implement more complex unique validation.
-        throw $e;
+        
+        //Use for debug:
+        //throw $e;
     }
 
     public function rules(): array

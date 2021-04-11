@@ -16,7 +16,7 @@ Market Data
                 <p>View market data below</p>
 
                 <div>
-                    <canvas id="marketChart"></canvas>
+                    <canvas id="marketChart" width="95%" height="60%"></canvas>
                 </div>
             </div>
         </div>
@@ -38,9 +38,15 @@ Market Data
             chart.data.labels.push(lb);
         });
         
-        chart.data.datasets[0].label = "BTC";
-        data["BTC"].forEach((pt) => {
+        chart.data.datasets[0].label = "BTC - Binance";
+        data["BTC - Binance"].forEach((pt) => {
             chart.data.datasets[0].data.push(pt);
+        });
+
+        //Add second series for FTX
+        chart.data.datasets[1].label = "BTC - FTX";
+        data["BTC - FTX"].forEach((pt) => {
+            chart.data.datasets[1].data.push(pt);
         });
 
         chart.update();
@@ -62,10 +68,44 @@ Market Data
         var myChart = new Chart(ctx, {
             type: 'line',
             data: {
-                datasets: [{
-                    borderWidth: 1
+                datasets: [
+                //Dataset0
+                {
+                    borderWidth: 1,
+
+                },
+                //Dataset1
+                {
+                    borderWidth: 1,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)'
                 }]
-            }/* ,
+            },
+            //Enable zoom and pan: https://github.com/chartjs/chartjs-plugin-zoomn
+            plugins: {
+                zoom: {
+                    // Container for pan options
+                    pan: {
+                        // Boolean to enable panning
+                        enabled: true,
+
+                        // Panning directions. Remove the appropriate direction to disable 
+                        // Eg. 'y' would only allow panning in the y direction
+                        mode: 'xy'
+                    },
+
+                    // Container for zoom options
+                    zoom: {
+                        // Boolean to enable zooming
+                        enabled: true,
+
+                        // Zooming directions. Remove the appropriate direction to disable 
+                        // Eg. 'y' would only allow zooming in the y direction
+                        mode: 'xy',
+                    }
+                }
+            }
+            /* ,
             options: {
                 scales: {
                     y: {
@@ -81,7 +121,7 @@ Market Data
         function (data) {
             console.log('Got new chart data');
             console.log(data);
-            console.log(data.data["BTC"]);
+            console.log(data.data["BTC - FTX"]);
             updateData(myChart, data.labels, data.data);
         })
         //Success:

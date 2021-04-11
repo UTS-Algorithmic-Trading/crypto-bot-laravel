@@ -42,6 +42,7 @@ class MarketDataController extends Controller
     {
         $request->validate([
             'file' => 'required|mimes:csv,txt,xlsx,xls|max:51200',
+            'exchange' => 'required|numeric',
         ]);
 
         if (!$request->file())
@@ -110,21 +111,49 @@ class MarketDataController extends Controller
      */
     public function chartData()
     {
+        //Set format of xAxis depending on interval used.
+        $intervalHours = 1;
+        $xFormat = 'Y-m-d H:i:s';
+
+        //For now just set hourly.
+        switch ($intervalHours)
+        {
+            default:
+                $xFormat = 'd M H:i';
+                break;
+        }
+
         $tz = new DateTimeZone('UTC');
-        $dtStart = new DateTimeImmutable('2020-09-11 20:40:00', $tz);
-        $dtEnd = $dtStart->add(new DateInterval('PT1H'));
+        $dtStart = new DateTimeImmutable('2020-11-22 00:00:00', $tz);
+        $dtEnd = $dtStart->add(new DateInterval('PT'.$intervalHours.'H'));
         $rows = MarketData::where('symbol', 'BTC/USDT')
                     ->where('date', '>=', $dtStart)
-                    ->where('date', '<=', $dtEnd)->get();
+                    ->where('date', '<=', $dtEnd)
+                    ->where('exchange', 1)->get(); //Exchange 1 is binance
+
+
+        $rowsFTX = MarketData::where('symbol', 'BTC/USDT')
+                            ->where('date', '>=', $dtStart)
+                            ->where('date', '<=', $dtEnd)
+                            ->where('exchange', 2)->get(); //Exchange 2 is FTX
+
         $labels = []; //Labels is the x-axis values
         $data = [];
         //BTC is the base data series. Add others with a different key.
         //The key doubles as the series label
-        $data['BTC'] = [];
+        $data['BTC - Binance'] = [];
         foreach ($rows as $row)
         {
-            $labels[] = $row->date;
-            $data['BTC'][] = $row->open_price;
+            $labels[] = $row->date->format($xFormat);
+            $data['BTC - Binance'][] = $row->open_price;
+        }
+
+        $data['BTC - FTX'] = [];
+        foreach ($rowsFTX as $row)
+        {
+            //Only add labels the first time
+            //$labels[] = $row->date;
+            $data['BTC - FTX'][] = $row->open_price;
         }
 
         $val = [

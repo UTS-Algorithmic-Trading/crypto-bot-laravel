@@ -144,3 +144,19 @@ Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'chec
     Route::resource('bots', \App\Http\Controllers\BotController::class);
 
 });
+
+// Market - Registered and Activated User Routes
+Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'checkblocked']], function () {
+
+    Route::get('/market', [\App\Http\Controllers\MarketDataController::class, 'index'])->name('market.index');
+    Route::get('/market/chart_data', [\App\Http\Controllers\MarketDataController::class, 'chart_data']);
+
+});
+
+// Market - Registered and Activated and Admin User Routes
+Route::group(['middleware' => ['auth', 'activated', 'role:admin', 'activity', 'twostep', 'checkblocked']], function () {
+
+    Route::get('/market/upload', [\App\Http\Controllers\MarketDataController::class, 'create'])->name('market.create');
+    Route::post('/market/upload', [\App\Http\Controllers\MarketDataController::class, 'store'])->name('market.store');
+
+});

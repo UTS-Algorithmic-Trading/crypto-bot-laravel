@@ -27,7 +27,7 @@ class BotController extends Controller
      */
     public function index()
     {
-        $bots = Bot::all();
+        $bots = Bot::where('user_id', auth()->user()->id)->get();
         return view('bots.index', ['bots' => $bots]);
     }
 

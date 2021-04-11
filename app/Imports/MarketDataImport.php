@@ -6,11 +6,17 @@ use App\Models\MarketData;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
 
-class MarketDataImport implements ToModel, WithValidation, WithBatchInserts
+class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, SkipsOnError
 {
+
+    private $rows = 0;
+
     public function model(array $row)
     {
+        $this->rows++;
+
         return new MarketData([
             'date' => $row[1],
             'symbol' => $row[2],
@@ -27,6 +33,17 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts
     public function batchSize(): int
     {
         return 1000;
+    }
+
+        /**
+     * @param \Throwable $e
+     */
+    public function onError(\Throwable $e)
+    {
+        // We don't do anything on errors
+        // these are expected to be duplicate DB records, enforced by a unique index
+        // composited on symbol and date columns. This is until we can implement more complex unique validation.
+        $this->rows--;
     }
 
     public function rules(): array
@@ -58,5 +75,12 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts
             '8'  => 'required|numeric',
             '9'  => 'required|numeric',
         ];
+    }
+
+    // https://stackoverflow.com/questions/57942366/laravel-excel-get-total-number-of-rows-before-import
+    // https://docs.laravel-excel.com/3.1/architecture/objects.html#getters
+    public function getRowCount(): int
+    {
+        return $this->rows;
     }
 }

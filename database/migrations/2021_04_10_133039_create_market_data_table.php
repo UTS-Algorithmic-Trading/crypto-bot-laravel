@@ -25,6 +25,7 @@ class CreateMarketDataTable extends Migration
             $table->decimal('crypto_currency_volume', 16, 8)->unsigned();
             $table->decimal('base_currency_volume', 16, 8)->unsigned();
             $table->integer('trade_count')->unsigned();
+            $table->unique(['date','symbol']);
         });
     }
 

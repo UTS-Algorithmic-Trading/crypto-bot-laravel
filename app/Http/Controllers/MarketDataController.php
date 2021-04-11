@@ -47,6 +47,8 @@ class MarketDataController extends Controller
         $fileName = time().'_'.$request->file->getClientOriginalName();
         $filePath = 'app/public/'.$request->file('file')->storeAs('uploads', $fileName, 'public');
 
+        $import = new MarketDataImport;
+
         try {
             /* 
              * Tried using Laravel Excel package but v3.0 uses a separate model instead of Excel::load
@@ -74,7 +76,7 @@ class MarketDataController extends Controller
                 }
             });
             */
-            Excel::import(new MarketDataImport, storage_path($filePath));
+            Excel::import($import, storage_path($filePath));
         }
         catch (\Maatwebsite\Excel\Validators\ValidationException $e)
         {
@@ -92,25 +94,8 @@ class MarketDataController extends Controller
                 'Failed to read data: '.$e->getMessage()
             ]);
         }
-        return back()->with('success', 'Successfully uploaded file '.$fileName);
 
-    }
+        return back()->with('success', 'Successfully uploaded file '.$fileName.' and imported '.$import->getRowCount().' rows');
 
-    /* Reads first row or two of the upload and validates the
-     * data is correct format.
-     * 
-     * Format of errors array is as defined here:
-     * https://www.edureka.co/community/90805/how-to-use-witherrors-with-exception-error-messages-laravel
-     * 
-     * @param array $rows Array of rows of data 
-     * @return TRUE if valid or array of error messages if not
-     */
-    private function _validateUpload($rows)
-    {
-        for ($i = 0; $i < count($rows); $i++)
-        {
-            ddd($rows[$i]);
-        }
-        return TRUE;
     }
 }

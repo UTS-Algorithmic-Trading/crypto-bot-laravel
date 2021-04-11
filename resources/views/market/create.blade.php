@@ -25,7 +25,16 @@
                 <form method="POST" action="{{ route('market.store') }}" id="create-form" enctype="multipart/form-data">
                     @csrf
 
+                    <div class="mb-3">
+                        <label for="exchange">Select exchange</label>
+                        <select name="exchange" id="exchange" class="form-select form-control">
+                            <option value="1">Binance</option>
+                            <option value="2">FTX</option>
+                        </select>
+                    </div>
+
                     <!-- Submit Field -->
+                    <label>Upload file for exchange</label>
                     <div class="form-group col pl-0">
                         <div class="custom-file">
                             <input type="file" name="file" class="custom-file-input" id="chooseFile">

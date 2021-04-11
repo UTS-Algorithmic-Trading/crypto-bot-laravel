@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\SkipsOnError;
 
 class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, SkipsOnError
 {
-
+    public $exchange = 1;
     private $rows = 0;
 
     public function model(array $row)
@@ -25,6 +25,7 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, Ski
         //EDIT: Yep, it's 3 digits too long. Going to remove last 3 digits. Same issue happens for both DateTime and gmdate()
 
         return new MarketData([
+            'exchange' => $this->exchange,
             'date' => new \DateTime('@'.$epoch),
             'symbol' => $row[2],
             'open_price' => $row[3],
@@ -33,7 +34,7 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, Ski
             'close_price' => $row[6],
             'crypto_currency_volume' => $row[7],
             'base_currency_volume' => $row[8],
-            'trade_count' => $row[9]
+            'trade_count' => (isset($row[9]) ? $row[9] : 0),
         ]);
     }
 
@@ -50,7 +51,7 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, Ski
         // We don't do anything on errors
         // these are expected to be duplicate DB records, enforced by a unique index
         // composited on symbol and date columns. This is until we can implement more complex unique validation.
-        $this->rows--;
+        throw $e;
     }
 
     public function rules(): array
@@ -64,7 +65,7 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, Ski
             //- https://github.com/Maatwebsite/Laravel-Excel/issues/2709
             //- https://github.com/Maatwebsite/Laravel-Excel/issues/2872
             '0' => [
-                'required|numeric', 
+                'required','numeric', 
                 /*
                 TODO: Unique by date AND symbol
                 'unique:market_data,NULL,'
@@ -80,7 +81,7 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, Ski
             '6'  => 'required|numeric|between:0,1000000',
             '7'  => 'required|numeric',
             '8'  => 'required|numeric',
-            '9'  => 'required|numeric',
+            '9'  => 'numeric|sometimes',
         ];
     }
 

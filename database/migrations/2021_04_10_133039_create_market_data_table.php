@@ -18,6 +18,7 @@ class CreateMarketDataTable extends Migration
             $table->timestamps();
             $table->timestamp('date');
             $table->string('symbol');
+            $table->tinyInteger('exchange');
             $table->decimal('open_price', 10, 4)->unsigned();
             $table->decimal('high_price', 10, 4)->unsigned();
             $table->decimal('low_price', 10, 4)->unsigned();
@@ -25,7 +26,7 @@ class CreateMarketDataTable extends Migration
             $table->decimal('crypto_currency_volume', 16, 8)->unsigned();
             $table->decimal('base_currency_volume', 16, 8)->unsigned();
             $table->integer('trade_count')->unsigned();
-            $table->unique(['date','symbol']);
+            $table->unique(['date','symbol','exchange']);
         });
     }
 

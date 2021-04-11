@@ -51,6 +51,7 @@ class MarketDataController extends Controller
         $filePath = 'app/public/'.$request->file('file')->storeAs('uploads', $fileName, 'public');
 
         $import = new MarketDataImport;
+        $import->exchange = $request->input('exchange');
 
         try {
             /* 

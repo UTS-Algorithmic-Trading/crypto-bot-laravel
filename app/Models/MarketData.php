@@ -60,6 +60,7 @@ class MarketData extends Model
         'crypto_currency_volume',
         'base_currency_volume',
         'trade_count',
+        'exchange',
     ];
 
     /**

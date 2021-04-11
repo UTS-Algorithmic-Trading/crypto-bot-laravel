@@ -149,7 +149,7 @@ Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'chec
 Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'checkblocked']], function () {
 
     Route::get('/market', [\App\Http\Controllers\MarketDataController::class, 'index'])->name('market.index');
-    Route::get('/market/chart_data', [\App\Http\Controllers\MarketDataController::class, 'chart_data']);
+    Route::get('/market/chart_data', [\App\Http\Controllers\MarketDataController::class, 'chartData'])->name('market.chart_data');
 
 });
 

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\MarketData;
 use App\Imports\MarketDataImport;
+use DateInterval;
+use DateTimeZone;
+use DateTimeImmutable;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -97,5 +100,38 @@ class MarketDataController extends Controller
 
         return back()->with('success', 'Successfully uploaded file '.$fileName.' and imported '.$import->getRowCount().' rows');
 
+    }
+
+    /**
+     * Return chart data
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function chartData()
+    {
+        $tz = new DateTimeZone('UTC');
+        $dtStart = new DateTimeImmutable('2020-09-11 20:40:00', $tz);
+        $dtEnd = $dtStart->add(new DateInterval('PT1H'));
+        $rows = MarketData::where('symbol', 'BTC/USDT')
+                    ->where('date', '>=', $dtStart)
+                    ->where('date', '<=', $dtEnd)->get();
+        $labels = []; //Labels is the x-axis values
+        $data = [];
+        //BTC is the base data series. Add others with a different key.
+        //The key doubles as the series label
+        $data['BTC'] = [];
+        foreach ($rows as $row)
+        {
+            $labels[] = $row->date;
+            $data['BTC'][] = $row->open_price;
+        }
+
+        $val = [
+            'labels' => $labels,
+            'data' => $data,
+        ];
+
+        //ddd($val);
+        return response()->json($val);
     }
 }

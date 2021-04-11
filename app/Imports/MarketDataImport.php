@@ -17,8 +17,15 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, Ski
     {
         $this->rows++;
 
+        $epoch = substr($row[0], 0, 10);
+        //E.g. Epoch of 1599856800000 should give Friday, 11 September 2020 20:40:00
+        //It Should be  1599856800
+        //The Max epoch 2147483647 
+        //But I get a time of 52667-06-12 02:40:00 and so it must be wrapping around somehow.
+        //EDIT: Yep, it's 3 digits too long. Going to remove last 3 digits. Same issue happens for both DateTime and gmdate()
+
         return new MarketData([
-            'date' => $row[1],
+            'date' => new \DateTime('@'.$epoch),
             'symbol' => $row[2],
             'open_price' => $row[3],
             'high_price' => $row[4],
@@ -56,8 +63,8 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, Ski
             //Examples of doing a unique validation on two columns:
             //- https://github.com/Maatwebsite/Laravel-Excel/issues/2709
             //- https://github.com/Maatwebsite/Laravel-Excel/issues/2872
-            '1' => [
-                'required', 
+            '0' => [
+                'required|numeric', 
                 /*
                 TODO: Unique by date AND symbol
                 'unique:market_data,NULL,'

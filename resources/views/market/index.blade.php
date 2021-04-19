@@ -18,6 +18,8 @@ Market Data
                 <div>
                     <canvas id="marketChart" width="95%" height="60%"></canvas>
                 </div>
+                <hr>
+                <a href="#" class="btn btn-primary" id="run-arbitrage">Run Arbitrage</a>
             </div>
         </div>
     </div>
@@ -25,6 +27,7 @@ Market Data
 @endsection
 
 @section('footer_scripts')
+
 <script>
 
     //Update data via AJAX JSON data.
@@ -52,6 +55,34 @@ Market Data
         chart.update();
     }
 
+    function addDataPoints(chart, newPts)
+    {
+        chart.data.datasets[2] = {
+            label: 'Buy',
+            type: 'scatter',
+            backgroundColor: 'rgba(42, 189, 86, 0.2)',
+            borderColor: 'rgba(34, 128, 62, 1)',
+            data: []
+        };
+
+        console.log("New points:");
+        console.log(newPts);
+
+        chart.data.labels.forEach((date, idx) => {
+            console.log("Index: "+idx);
+            console.log("Current date: "+date);
+            console.log("Current pt: ");
+            if (idx < newPts.length)
+                console.log(newPts[idx]);
+
+            if (idx < newPts['buy'].length && newPts['buy'][idx]['date'] == date)
+                chart.data.datasets[2].data.push(newPt['open_price']);
+            else
+                chart.data.datasets[2].data.push(null); //Add empty value if no buy pt here
+        });
+        chart.update();
+    }
+
     function removeData(chart) {
         chart.clear();
         console.log("Removing data...");
@@ -71,11 +102,13 @@ Market Data
                 datasets: [
                 //Dataset0
                 {
+                    type: 'line',
                     borderWidth: 1,
 
                 },
                 //Dataset1
                 {
+                    type: 'line',
                     borderWidth: 1,
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
                     borderColor: 'rgba(255, 99, 132, 1)'
@@ -131,6 +164,19 @@ Market Data
         //Failure:
         .fail(function () {
             console.log("Request for market data failed");
+        });
+
+        //Trigger the run arbitrage simulation
+        $('#run-arbitrage').on('click', function (){
+            $.get("{{ route('market.run_arbitrage_algorithm') }}",
+            function (data) {
+                console.log("Got arbitrage data");
+                console.log(data);
+                addDataPoints(myChart, data);
+            })
+            .fail(function () {
+                console.log("Failed to get arbitrage data");
+            });
         });
     });
 </script>

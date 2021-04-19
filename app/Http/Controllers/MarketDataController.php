@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MarketData;
 use App\Imports\MarketDataImport;
+use App\Providers\ArbitrageAlgorithmService;
 use DateInterval;
 use DateTimeZone;
 use DateTimeImmutable;
@@ -163,5 +164,18 @@ class MarketDataController extends Controller
 
         //ddd($val);
         return response()->json($val);
+    }
+
+    public function runArbitrageAlgorithm()
+    {
+        //Set format of xAxis depending on interval used.
+        $intervalHours = 1;
+
+        $tz = new DateTimeZone('UTC');
+        $dtStart = new DateTimeImmutable('2020-11-22 00:00:00', $tz);
+        $dtEnd = $dtStart->add(new DateInterval('PT'.$intervalHours.'H'));
+
+        $service = new ArbitrageAlgorithmService($dtStart, $dtEnd);
+        return response()->json($service->getData($dtStart, $dtEnd, 'BTC/USDT'));
     }
 }

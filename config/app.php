@@ -176,6 +176,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         \SocialiteProviders\Manager\ServiceProvider::class,
+        //Load custom services per algorithm.
+        App\Providers\ArbitrageAlgorithmService::class,
     ],
 
     /*

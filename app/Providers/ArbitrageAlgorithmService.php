@@ -51,8 +51,7 @@ class ArbitrageAlgorithmService extends ServiceProvider
         if ($count == 0)
             return [];
 
-        $buyPts = [];
-        $sellPts = [];
+        $newPts = [];
 
         $trackFTXLastValue = $rowsFTX[0]->open_price;
         $trackFTXWasLower = ($rowsFTX[0]->open_price < $rowsBinance[0]->open_price);
@@ -66,16 +65,21 @@ class ArbitrageAlgorithmService extends ServiceProvider
             if ($trackFTXWasLower && ($rowsFTX[$i]->open_price > $rowsBinance[$i]->open_price))
             {
                 //Crossed into a bullish market. So buy? Add a buy point
-                $buyPts[] = ['date' => $rowsFTX[$i]->date->format('d M H:i'), 'open_price' => $rowsFTX[$i]->open_price];
+                $newPts[] = ['type' => 'buy', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'open_price' => $rowsFTX[$i]->open_price];
             }
             else if (!$trackFTXWasLower && ($rowsFTX[$i]->open_price < $rowsBinance[$i]->open_price))
             {
                 //Crossed into a bearish market. So sell? Add a sell point
-                $sellPts[] = ['date' => $rowsFTX[$i]->date->format('d M H:i'), 'open_price' => $rowsFTX[$i]->open_price];
+                $newPts[] = ['type' => 'sell', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'open_price' => $rowsFTX[$i]->open_price];
+            }
+            else
+            {
+                //Add pt as an empty point for the chart to skip over.
+                $newPts[] = ['type' => 'empty', $rowsFTX[$i]->date->format('d M H:i'), 'open_price' => $rowsFTX[$i]->open_price];
             }
 
             $trackFTXWasLower = ($rowsFTX[$i]->open_price < $rowsBinance[$i]->open_price);
         }
-        return ['buy' => $buyPts, 'sell' => $sellPts];       
+        return $newPts;       
     }
 }

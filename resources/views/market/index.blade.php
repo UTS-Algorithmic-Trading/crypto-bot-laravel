@@ -58,27 +58,51 @@ Market Data
     function addDataPoints(chart, newPts)
     {
         chart.data.datasets[2] = {
-            label: 'Buy',
+            label: 'Buy FTX',
             type: 'scatter',
-            backgroundColor: 'rgba(42, 189, 86, 0.2)',
+            backgroundColor: 'rgba(42, 189, 86, 1)',
             borderColor: 'rgba(34, 128, 62, 1)',
+            borderWidth: 5,
+            data: []
+        };
+
+        chart.data.datasets[3] = {
+            label: 'Sell FTX',
+            type: 'scatter',
+            backgroundColor: 'rgba(252, 48, 3, 1)',
+            borderColor: 'rgba(224, 18, 18, 1)',
+            borderWidth: 5,
             data: []
         };
 
         console.log("New points:");
         console.log(newPts);
 
-        chart.data.labels.forEach((date, idx) => {
-            console.log("Index: "+idx);
-            console.log("Current date: "+date);
-            console.log("Current pt: ");
-            if (idx < newPts.length)
-                console.log(newPts[idx]);
+        newPts.forEach((pt) => {
 
+            if (pt['type'] == 'buy')
+            {
+                chart.data.datasets[2].data.push(pt['open_price']);
+                chart.data.datasets[3].data.push(null);
+            }
+            else if (pt['type'] == 'sell')
+            {
+                chart.data.datasets[3].data.push(pt['open_price']);
+                chart.data.datasets[2].data.push(null);
+            }
+            else
+            {
+                chart.data.datasets[2].data.push(null);
+                chart.data.datasets[3].data.push(null);
+            }
+
+
+            /*
             if (idx < newPts['buy'].length && newPts['buy'][idx]['date'] == date)
                 chart.data.datasets[2].data.push(newPt['open_price']);
             else
                 chart.data.datasets[2].data.push(null); //Add empty value if no buy pt here
+            */
         });
         chart.update();
     }

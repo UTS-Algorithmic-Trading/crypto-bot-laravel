@@ -55,6 +55,7 @@ class ArbitrageAlgorithmService extends ServiceProvider
 
         $trackBinanceLastValue = $rowsBinance[0]->close_price;
         $trackBinanceWasLower = ($rowsBinance[0]->close_price < $rowsFTX[0]->close_price);
+        $lastBuyValue = 0;
 
         //For each point, compare FTX to Binance
         //if the last value of Binance was lower than FTX and is 
@@ -64,17 +65,18 @@ class ArbitrageAlgorithmService extends ServiceProvider
         {
             if ($trackBinanceWasLower && ($rowsBinance[$i]->close_price > $rowsFTX[$i]->close_price))
             {
-                $newPts[] = ['type' => 'buy', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsFTX[$i]->close_price];
+                $newPts[] = ['type' => 'buy', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsBinance[$i]->close_price];
+                $lastBuyValue = $rowsBinance[$i]->close_price;
             }
             //If Binance was higher than FTX and is now lower than FTX:
-            else if (!$trackBinanceWasLower && ($rowsBinance[$i]->close_price < $rowsFTX[$i]->close_price))
+            else if (!$trackBinanceWasLower && ($rowsBinance[$i]->close_price < $rowsFTX[$i]->close_price) && $rowsBinance[$i]->close_price > $lastBuyValue)
             {
-                $newPts[] = ['type' => 'sell', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsFTX[$i]->close_price];
+                $newPts[] = ['type' => 'sell', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsBinance[$i]->close_price];
             }
             else
             {
                 //Add pt as an empty point for the chart to skip over.
-                $newPts[] = ['type' => 'empty', $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsFTX[$i]->close_price];
+                $newPts[] = ['type' => 'empty', $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsBinance[$i]->close_price];
             }
 
             $trackBinanceWasLower = ($rowsBinance[$i]->close_price < $rowsFTX[$i]->close_price);

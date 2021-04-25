@@ -58,7 +58,7 @@ Market Data
     function addDataPoints(chart, newPts)
     {
         chart.data.datasets[2] = {
-            label: 'Buy FTX',
+            label: 'Buy Binance',
             type: 'scatter',
             backgroundColor: 'rgba(42, 189, 86, 1)',
             borderColor: 'rgba(34, 128, 62, 1)',
@@ -67,7 +67,7 @@ Market Data
         };
 
         chart.data.datasets[3] = {
-            label: 'Sell FTX',
+            label: 'Sell Binance',
             type: 'scatter',
             backgroundColor: 'rgba(252, 48, 3, 1)',
             borderColor: 'rgba(224, 18, 18, 1)',

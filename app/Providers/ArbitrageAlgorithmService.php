@@ -53,21 +53,21 @@ class ArbitrageAlgorithmService extends ServiceProvider
 
         $newPts = [];
 
-        $trackFTXLastValue = $rowsFTX[0]->open_price;
-        $trackFTXWasLower = ($rowsFTX[0]->open_price < $rowsBinance[0]->open_price);
+        $trackBinanceLastValue = $rowsBinance[0]->open_price;
+        $trackBinanceWasLower = ($rowsBinance[0]->open_price < $rowsFTX[0]->open_price);
 
-        //For each point, compare binance to FTX
-        //if the last value of FTX was lower than Binance and is 
-        //now higher than Binance, then it is bullish.
-        //Otherwise bearish
+        //For each point, compare FTX to Binance
+        //if the last value of Binance was lower than FTX and is 
+        //now higher than FTX, then it is bearish.
+        //Otherwise bullish
         for ($i = 0; $i < $count; $i++)
         {
-            if ($trackFTXWasLower && ($rowsFTX[$i]->open_price > $rowsBinance[$i]->open_price))
+            if ($trackBinanceWasLower && ($rowsBinance[$i]->open_price < $rowsFTX[$i]->open_price))
             {
                 //Crossed into a bullish market. So buy? Add a buy point
                 $newPts[] = ['type' => 'buy', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'open_price' => $rowsFTX[$i]->open_price];
             }
-            else if (!$trackFTXWasLower && ($rowsFTX[$i]->open_price < $rowsBinance[$i]->open_price))
+            else if (!$trackBinanceWasLower && ($rowsBinance[$i]->open_price > $rowsFTX[$i]->open_price))
             {
                 //Crossed into a bearish market. So sell? Add a sell point
                 $newPts[] = ['type' => 'sell', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'open_price' => $rowsFTX[$i]->open_price];
@@ -78,7 +78,8 @@ class ArbitrageAlgorithmService extends ServiceProvider
                 $newPts[] = ['type' => 'empty', $rowsFTX[$i]->date->format('d M H:i'), 'open_price' => $rowsFTX[$i]->open_price];
             }
 
-            $trackFTXWasLower = ($rowsFTX[$i]->open_price < $rowsBinance[$i]->open_price);
+            $trackBinanceWasLower = ($rowsBinance[$i]->open_price < $rowsFTX[$i]->open_price);
+            $trackBinanceLastValue = $rowsBinance[$i]->open_price;
         }
         return $newPts;       
     }

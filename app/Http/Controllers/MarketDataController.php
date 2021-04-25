@@ -146,7 +146,7 @@ class MarketDataController extends Controller
         foreach ($rows as $row)
         {
             $labels[] = $row->date->format($xFormat);
-            $data['BTC - Binance'][] = $row->open_price;
+            $data['BTC - Binance'][] = $row->close_price;
         }
 
         $data['BTC - FTX'] = [];
@@ -154,7 +154,7 @@ class MarketDataController extends Controller
         {
             //Only add labels the first time
             //$labels[] = $row->date;
-            $data['BTC - FTX'][] = $row->open_price;
+            $data['BTC - FTX'][] = $row->close_price;
         }
 
         $val = [

@@ -82,12 +82,12 @@ Market Data
 
             if (pt['type'] == 'buy')
             {
-                chart.data.datasets[2].data.push(pt['open_price']);
+                chart.data.datasets[2].data.push(pt['close_price']);
                 chart.data.datasets[3].data.push(null);
             }
             else if (pt['type'] == 'sell')
             {
-                chart.data.datasets[3].data.push(pt['open_price']);
+                chart.data.datasets[3].data.push(pt['close_price']);
                 chart.data.datasets[2].data.push(null);
             }
             else
@@ -99,7 +99,7 @@ Market Data
 
             /*
             if (idx < newPts['buy'].length && newPts['buy'][idx]['date'] == date)
-                chart.data.datasets[2].data.push(newPt['open_price']);
+                chart.data.datasets[2].data.push(newPt['close_price']);
             else
                 chart.data.datasets[2].data.push(null); //Add empty value if no buy pt here
             */

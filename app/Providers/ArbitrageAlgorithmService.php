@@ -104,7 +104,7 @@ class ArbitrageAlgorithmService extends ServiceProvider
                 $lastBuyValue = $rowsBinance[$i]->close_price;
             }
             //If Binance was higher than FTX and is now lower than FTX:
-            else if (!$trackBinanceWasLower && ($rowsBinance[$i]->close_price < $rowsFTX[$i]->close_price) && $rowsBinance[$i]->close_price > $lastBuyValue)
+            else if (!$trackBinanceWasLower && ($rowsBinance[$i]->close_price < $rowsFTX[$i]->close_price))
             {
                 $this->performTransaction($simulation, 'Binance', 'FTX', 'BTC/USDT', $rowsBinance[$i]->close_price, $rowsFTX[$i]->close_price);
                 $newPts[] = ['type' => 'buy', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsBinance[$i]->close_price];

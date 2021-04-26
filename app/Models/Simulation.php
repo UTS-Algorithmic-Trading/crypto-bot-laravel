@@ -51,6 +51,7 @@ class Simulation extends Model
      * @var array
      */
     protected $fillable = [
+        'user_id',
         'start_time',
         'end_time',
         'currency',

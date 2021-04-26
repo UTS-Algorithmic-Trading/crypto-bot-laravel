@@ -17,7 +17,10 @@ class CreateSimulationEntriesTable extends Migration
             $table->id();
             $table->timestamps();
             $table->bigInteger('simulation_id')->unsigned();
+            $table->bigInteger('bot_id')->unsigned();
             $table->foreign('simulation_id')->references('id')->on('simulations');
+            $table->foreign('bot_id')->references('id')->on('bots');
+            $table->decimal('amount', 16, 8);
             $table->decimal('buy_price', 16, 8)->unsigned();
             $table->decimal('sell_price', 16, 8)->unsigned();
             $table->string('description');

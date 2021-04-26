@@ -17,11 +17,15 @@ class CreateSimulationsTable extends Migration
             $table->id();
             $table->timestamps();
             $table->softDeletes();
+            $table->bigInteger('user_id')->unsigned();
+            
             $table->string('currency');
             $table->string('algorithm_name');
             $table->timestamp('start_time');
             $table->timestamp('end_time')->nullable();
             $table->decimal('total_profit', 16, 8)->nullable();
+
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use DateTime;
 use Log;
+use App\Models\Bot;
 use App\Models\MarketData;
 use App\Models\Simulation;
 use App\Models\SimulationEntry;
@@ -13,7 +14,7 @@ class ArbitrageAlgorithmService extends ServiceProvider
 {
     private $startDate;
     private $endDate;
-    private $entry;
+    private $bot;
     private $profit;
 
     /**
@@ -38,15 +39,21 @@ class ArbitrageAlgorithmService extends ServiceProvider
 
     private function performTransaction($simulation, $buy_exchange, $sell_exchange, $currency, $buy_price, $sell_price)
     {
-        Log::info('Simulation ID: '.$simulation->id);
+        Log::info('Running Simulation ID: '.$simulation->id);
+        $amount = $this->bot->max_bet;
+        $sell_amount = $sell_price * $amount;
+        $buy_amount = $buy_price * $amount;
+        $profit_amount = ($sell_price - $buy_price) * $amount;
         SimulationEntry::create([
             'simulation_id' => $simulation->id,
+            'bot_id' => $this->bot->id,
+            'amount' => $amount,
             'buy_price' => $buy_price,
             'sell_price' => $sell_price,
-            'description' => 'Bought from '.$buy_exchange.' and sold at '.$sell_exchange,
+            'description' => 'Bought $'.$buy_amount.' of '.$currency.' from '.$buy_exchange.' and sold $'.$sell_amount.' at '.$sell_exchange.' for profit of: '.$profit_amount,
         ]);
 
-        $this->profit += ($sell_price - $buy_price);
+        $this->profit += $profit_amount;
     }
 
     public function getData($start, $end, $currency)
@@ -54,7 +61,10 @@ class ArbitrageAlgorithmService extends ServiceProvider
         $this->startDate = $start;
         $this->endDate = $end;
 
+        $this->bot = Bot::findOrFail(1); //Hardcode bot 1 for now.
+
         $simulation = Simulation::create([
+            'user_id' => auth()->user()->id,
             'currency' => $currency,
             'algorithm_name' => 'Arbitrage',
             'start_time' => new DateTime(),
@@ -89,15 +99,15 @@ class ArbitrageAlgorithmService extends ServiceProvider
         {
             if ($trackBinanceWasLower && ($rowsBinance[$i]->close_price > $rowsFTX[$i]->close_price))
             {
-                $this->performTransaction($simulation, 'Binance', 'FTX', 'BTC/USDT', $rowsBinance[$i]->close_price, $rowsFTX[$i]->close_price);
-                $newPts[] = ['type' => 'buy', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsBinance[$i]->close_price];
+                $this->performTransaction($simulation, 'FTX', 'Binance', 'BTC/USDT', $rowsFTX[$i]->close_price, $rowsBinance[$i]->close_price);
+                $newPts[] = ['type' => 'sell', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsBinance[$i]->close_price];
                 $lastBuyValue = $rowsBinance[$i]->close_price;
             }
             //If Binance was higher than FTX and is now lower than FTX:
             else if (!$trackBinanceWasLower && ($rowsBinance[$i]->close_price < $rowsFTX[$i]->close_price) && $rowsBinance[$i]->close_price > $lastBuyValue)
             {
-                $this->performTransaction($simulation, 'FTX', 'Binance', 'BTC/USDT', $rowsFTX[$i]->close_price, $rowsBinance[$i]->close_price);
-                $newPts[] = ['type' => 'sell', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsBinance[$i]->close_price];
+                $this->performTransaction($simulation, 'Binance', 'FTX', 'BTC/USDT', $rowsBinance[$i]->close_price, $rowsFTX[$i]->close_price);
+                $newPts[] = ['type' => 'buy', 'date' => $rowsFTX[$i]->date->format('d M H:i'), 'close_price' => $rowsBinance[$i]->close_price];
             }
             else
             {

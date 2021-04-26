@@ -43,6 +43,8 @@ class SimulationEntry extends Model
      */
     protected $fillable = [
         'simulation_id',
+        'bot_id',
+        'amount',
         'buy_price',
         'sell_price',
         'description',

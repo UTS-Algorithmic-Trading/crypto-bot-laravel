@@ -20,6 +20,9 @@ Market Data
                 </div>
                 <hr>
                 <a href="#" class="btn btn-primary" id="run-arbitrage">Run Arbitrage</a>
+                <hr>
+                <div id="run-results">
+                </div>
             </div>
         </div>
     </div>
@@ -196,7 +199,28 @@ Market Data
             function (data) {
                 console.log("Got arbitrage data");
                 console.log(data);
-                addDataPoints(myChart, data);
+                addDataPoints(myChart, data['data']);
+                //Update with simulation info
+                console.log('Simulation done');
+                console.log(data);
+                console.log('Simulation profit: $'+data['simulation'].total_profit);
+                console.log('Simulation profit in USDT: $'+data['profit_usdt']);
+                var resultDiv = $('#run-results');
+                resultDiv.html(
+                    '<strong>Simulation finished running</strong>'+
+                    '<p>Total profit in '+data['simulation'].currency+' is: '+data['simulation'].total_profit+'</p>'+
+                    '<p>Total profit in USDT is '+data['profit_usdt']+'</p>'
+                );
+                /*
+                //Get profit in USDT
+                $.get("{* route('simulation.get_profit') *}"+"/"+data['simulation'].id,
+                function (profit_data) {
+                    console.log('Found profit:');
+                    console.log(profit_data);
+                    //Update UI with simulation profit.
+                    console.log('Profit in USD is: $'+profit_data['profit_usdt']);
+                });
+                */
             })
             .fail(function () {
                 console.log("Failed to get arbitrage data");

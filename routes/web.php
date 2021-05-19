@@ -142,6 +142,7 @@ Route::redirect('/php', '/phpinfo', 301);
 Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'checkblocked']], function () {
 
     Route::resource('bots', \App\Http\Controllers\BotController::class);
+    Route::get('/bots/twitter_search/{query}', [\App\Http\Controllers\BotController::class, 'searchRecent'])->name('bots.twitter_search');
 
 });
 
@@ -160,4 +161,10 @@ Route::group(['middleware' => ['auth', 'activated', 'role:admin', 'activity', 't
     Route::get('/market/upload', [\App\Http\Controllers\MarketDataController::class, 'create'])->name('market.create');
     Route::post('/market/upload', [\App\Http\Controllers\MarketDataController::class, 'store'])->name('market.store');
 
+});
+
+// Simulation - Outcomes of simulations
+Route::group(['middleware' => ['auth', 'activated', 'role:admin', 'activity', 'twostep', 'checkblocked']], function () {
+
+    Route::get('/simulation/get_profit/{simulation}', [\App\Http\Controllers\SimulationController::class, 'get_profit'])->name('simulation.get_profit');
 });

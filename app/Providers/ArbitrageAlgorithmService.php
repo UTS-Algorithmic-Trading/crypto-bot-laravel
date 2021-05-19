@@ -41,9 +41,9 @@ class ArbitrageAlgorithmService extends ServiceProvider
     {
         Log::info('Running Simulation ID: '.$simulation->id);
         $amount = $this->bot->max_bet;
-        $sell_amount = $sell_price * $amount;
-        $buy_amount = $buy_price * $amount;
-        $profit_amount = ($sell_price - $buy_price) * $amount;
+        $sell_amount = $amount / $sell_price;
+        $buy_amount = $amount / $buy_price;
+        $profit_amount = $buy_amount - $sell_amount;
         SimulationEntry::create([
             'simulation_id' => $simulation->id,
             'bot_id' => $this->bot->id,
@@ -123,6 +123,11 @@ class ArbitrageAlgorithmService extends ServiceProvider
         $simulation->total_profit = $this->profit;
         $simulation->save();
 
-        return $newPts;       
+        //Get the latest currency conversion according to the market data to find out how much profit you would make in USD.
+        $currency_conversion = MarketData::where('symbol', $simulation->currency)->where('exchange', 1)->orderBy('date', 'desc')->first();
+        $rate_usdt = $currency_conversion->close_price;
+        $profit_usdt = $simulation->total_profit * $rate_usdt;
+
+        return ['simulation' => $simulation, 'data' => $newPts, 'profit_usdt' => $profit_usdt, 'rate_usdt' => $rate_usdt];       
     }
 }

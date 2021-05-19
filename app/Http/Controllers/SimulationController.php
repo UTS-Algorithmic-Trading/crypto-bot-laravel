@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Simulation;
+use App\Models\MarketData;
 use Illuminate\Http\Request;
 
 class SimulationController extends Controller
@@ -81,5 +82,16 @@ class SimulationController extends Controller
     public function destroy(Simulation $simulation)
     {
         //
+    }
+
+    public function get_profit(Simulation $simulation)
+    {
+        //Get the latest currency conversion according to the market data to find out how much profit you would make in USD.
+        $currency_conversion = MarketData::where('symbol', $simulation->currency)->where('exchange', 1)->orderBy('date', 'desc')->first();
+        $rate_usdt = $currency_conversion->close_price;
+
+        //Profit in USDT
+        $profit_usdt = $simulation->total_profit * $rate_usdt;
+        return ['profit_usdt' => $profit_usdt, 'rate_usdt' => $rate_usdt];
     }
 }

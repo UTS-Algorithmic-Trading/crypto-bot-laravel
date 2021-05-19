@@ -6,7 +6,9 @@ use App\Models\Bot;
 use Illuminate\Http\Request;
 use Auth;
 use Validator;
-
+use Atymic\Twitter\Twitter as TwitterContract;
+use Illuminate\Http\JsonResponse;
+use Twitter;
 class BotController extends Controller
 {
     /**
@@ -129,5 +131,23 @@ class BotController extends Controller
             'message' => 'Bot Deleted',
         ]);
 
+    }
+
+    public function searchRecent(string $query)
+    {
+        $params = [
+            'place.fields' => 'country,name',
+            'tweet.fields' => 'author_id,geo',
+            'expansions' => 'author_id,in_reply_to_user_id',
+            TwitterContract::KEY_RESPONSE_FORMAT => TwitterContract::RESPONSE_FORMAT_JSON,
+        ];
+
+        $user_response = json_decode(Twitter::getUserByUsername("elonmusk", []));
+        //ddd($user_response);
+
+        $response = Twitter::userTweets($user_response->data->id, []);
+        //$response = Twitter::searchRecent($query, $params);
+        ddd(json_decode($response));
+        return JsonResponse::fromJsonString($response);
     }
 }

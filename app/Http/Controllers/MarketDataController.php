@@ -8,6 +8,7 @@ use App\Providers\ArbitrageAlgorithmService;
 use DateInterval;
 use DateTimeZone;
 use DateTimeImmutable;
+use DateTime;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -110,10 +111,18 @@ class MarketDataController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function chartData()
+    public function chartData(string $start_date, string $end_date, string $currency)
     {
+        $localTz = new DateTimeZone('Australia/Sydney');
+        $utcTz = new DateTimeZone('UTC');
+        $dtStart = new DateTime($start_date, $localTz);
+        $dtEnd = new DateTime($end_date, $localTz);
+        //Convert to UTC
+        $dtStart->setTimezone($utcTz);
+        $dtEnd->setTimezone($utcTz);
+
         //Set format of xAxis depending on interval used.
-        $intervalHours = 1;
+        $intervalHours = floor(($dtEnd->getTimestamp() - $dtStart->getTimestamp()) / 3600);
         $xFormat = 'Y-m-d H:i:s';
 
         //For now just set hourly.
@@ -124,16 +133,13 @@ class MarketDataController extends Controller
                 break;
         }
 
-        $tz = new DateTimeZone('UTC');
-        $dtStart = new DateTimeImmutable('2020-11-22 00:00:00', $tz);
-        $dtEnd = $dtStart->add(new DateInterval('PT'.$intervalHours.'H'));
-        $rows = MarketData::where('symbol', 'BTC/USDT')
+        $rows = MarketData::where('symbol', $currency)
                     ->where('date', '>=', $dtStart)
                     ->where('date', '<=', $dtEnd)
                     ->where('exchange', 1)->get(); //Exchange 1 is binance
 
 
-        $rowsFTX = MarketData::where('symbol', 'BTC/USDT')
+        $rowsFTX = MarketData::where('symbol', $currency)
                             ->where('date', '>=', $dtStart)
                             ->where('date', '<=', $dtEnd)
                             ->where('exchange', 2)->get(); //Exchange 2 is FTX
@@ -142,19 +148,19 @@ class MarketDataController extends Controller
         $data = [];
         //BTC is the base data series. Add others with a different key.
         //The key doubles as the series label
-        $data['BTC - Binance'] = [];
+        $data[$currency.' - Binance'] = [];
         foreach ($rows as $row)
         {
             $labels[] = $row->date->format($xFormat);
-            $data['BTC - Binance'][] = $row->close_price;
+            $data[$currency.' - Binance'][] = $row->close_price;
         }
 
-        $data['BTC - FTX'] = [];
+        $data[$currency.' - FTX'] = [];
         foreach ($rowsFTX as $row)
         {
             //Only add labels the first time
             //$labels[] = $row->date;
-            $data['BTC - FTX'][] = $row->close_price;
+            $data[$currency.' - FTX'][] = $row->close_price;
         }
 
         $val = [
@@ -166,30 +172,35 @@ class MarketDataController extends Controller
         return response()->json($val);
     }
 
-    public function runArbitrageAlgorithm()
+    public function runArbitrageAlgorithm(string $start_date, string $end_date, string $currency)
     {
-        //Set format of xAxis depending on interval used.
-        $intervalHours = 1;
-
-        $tz = new DateTimeZone('UTC');
-        $dtStart = new DateTimeImmutable('2020-11-22 00:00:00', $tz);
-        $dtEnd = $dtStart->add(new DateInterval('PT'.$intervalHours.'H'));
+        $localTz = new DateTimeZone('Australia/Sydney');
+        $utcTz = new DateTimeZone('UTC');
+        $dtStart = new DateTime($start_date, $localTz);
+        $dtEnd = new DateTime($end_date, $localTz);
+        //Convert to UTC
+        $dtStart->setTimezone($utcTz);
+        $dtEnd->setTimezone($utcTz);
 
         $service = new ArbitrageAlgorithmService($dtStart, $dtEnd);
-        return response()->json($service->getData($dtStart, $dtEnd, 'BTC/USDT'));
+        return response()->json($service->getData($dtStart, $dtEnd, $currency));
     }
 
 
-    public function runArbitrageAlgorithm_V2()
+    public function runArbitrageAlgorithm_V2(string $start_date, string $end_date, string $currency)
     {
-        //Set format of xAxis depending on interval used.
-        $intervalHours = 1;
+        $localTz = new DateTimeZone('Australia/Sydney');
+        $utcTz = new DateTimeZone('UTC');
+        $dtStart = new DateTime($start_date, $localTz);
+        $dtEnd = new DateTime($end_date, $localTz);
+        //Convert to UTC
+        $dtStart->setTimezone($utcTz);
+        $dtEnd->setTimezone($utcTz);
 
-        $tz = new DateTimeZone('UTC');
-        $dtStart = new DateTimeImmutable('2020-11-22 00:00:00', $tz);
-        $dtEnd = $dtStart->add(new DateInterval('PT'.$intervalHours.'H'));
+        //Set format of xAxis depending on interval used.
+        $intervalHours = floor(($dtEnd->getTimestamp() - $dtStart->getTimestamp()) / 3600);
 
         $service = new ArbitrageAlgorithmService($dtStart, $dtEnd);
-        return response()->json($service->getDataV2($dtStart, $dtEnd, 'BTC/USDT'));
+        return response()->json($service->getDataV2($dtStart, $dtEnd, $currency));
     }
 }

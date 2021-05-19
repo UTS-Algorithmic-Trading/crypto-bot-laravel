@@ -14,8 +14,22 @@ Market Data
             <div class="col-12 col-lg-10 offset-lg-1">
 
                 <p>View market data below</p>
-
-                <div>
+                <div class="mb-3">
+                    <label for="start_date" class="form_label">Start Date</label>
+                    <input type="text" id="start_date" class="form-control" value="2020-11-22 10:00:00" />
+                </div>
+                <div class="mb-3">
+                    <label for="end_date" class="form_label">End Date</label>
+                    <input type="text" id="end_date" class="form-control" value="2020-11-22 11:00:00" />
+                </div>
+                <div class="mb-3">
+                    <label for="currency_selector" class="form_label">End Date</label>
+                    <select id="currency_selector" class="form-control">
+                        <option value="BTC/USDT" selected="selected">Bitcoin</option>
+                        <option value="ETH/USDT">Ethereum</option>
+                        <option value="XRP/USDT">XRP</option>
+                    </select>
+                </div>                <div>
                     <canvas id="marketChart" width="95%" height="60%"></canvas>
                 </div>
                 <hr>
@@ -41,21 +55,21 @@ Market Data
     //https://stackoverflow.com/questions/49360165/chart-js-update-function-chart-labels-data-will-not-update-the-chart
 
     //Call updateData once we have the new labels and data sets.
-    function updateData(chart, labels, data) {
+    function updateData(chart, labels, data, currency) {
         chart.clear();
 
         labels.forEach((lb) => {
             chart.data.labels.push(lb);
         });
         
-        chart.data.datasets[0].label = "BTC - Binance";
-        data["BTC - Binance"].forEach((pt) => {
+        chart.data.datasets[0].label = currency+" - Binance";
+        data[currency+" - Binance"].forEach((pt) => {
             chart.data.datasets[0].data.push(pt);
         });
 
         //Add second series for FTX
-        chart.data.datasets[1].label = "BTC - FTX";
-        data["BTC - FTX"].forEach((pt) => {
+        chart.data.datasets[1].label = currency+" - FTX";
+        data[currency+" - FTX"].forEach((pt) => {
             chart.data.datasets[1].data.push(pt);
         });
 
@@ -184,27 +198,40 @@ Market Data
             }*/
         });
 
-        console.log('Updating Chart with data');
-        $.get("{{ route('market.chart_data') }}", 
-        //Data returned:
-        function (data) {
-            console.log('Got new chart data');
-            console.log(data);
-            console.log(data.data["BTC - FTX"]);
-            updateData(myChart, data.labels, data.data);
-        })
-        //Success:
-        .done(function () {
+        function updateChart(startDate, endDate, currency)
+        {
+            console.log('Updating Chart with data');
+            console.log('Start Date: '+startDate);
+            console.log('End Date: '+endDate);
+            console.log('Currency: '+currency);
+            $.get("http://crypto.local/market/chart_data/"+encodeURIComponent(startDate)+"/"+encodeURIComponent(endDate)+"/"+encodeURIComponent(currency), 
+            //Data returned:
+            function (data) {
+                console.log('Got new chart data');
+                console.log(data);
+                console.log(data.data[currency+" - FTX"]);
+                updateData(myChart, data.labels, data.data, currency);
+            })
+            //Success:
+            .done(function () {
 
-        })
-        //Failure:
-        .fail(function () {
-            console.log("Request for market data failed");
-        });
+            })
+            //Failure:
+            .fail(function () {
+                console.log("Request for market data failed");
+            });
+        }
+
+        var startDate = $('#start_date').val();
+        var endDate = $('#end_date').val();
+        var currency = $('#currency_selector').val();
+
+        //Update chart on page load
+        updateChart(startDate, endDate, currency);
 
         //Trigger the run arbitrage simulation
         $('#run-arbitrage').on('click', function (){
-            $.get("{{ route('market.run_arbitrage_algorithm') }}",
+            $.get("http://crypto.local/market/run_arbitrage_algorithm/"+startDate+"/"+endDate+"/"+currency,
             function (data) {
                 console.log("Got arbitrage data");
                 console.log(data);
@@ -239,7 +266,7 @@ Market Data
 
         //Trigger the run arbitrage V2 simulation
         $('#run-arbitrage-v2').on('click', function (){
-            $.get("{{ route('market.run_arbitrage_algorithm_v2') }}",
+            $.get("http://crypto.local/market/run_arbitrage_algorithm_v2/"+startDate+"/"+endDate+"/"+currency,
             function (data) {
                 console.log("Got arbitrage data");
                 console.log(data);

@@ -149,5 +149,14 @@ class BotController extends Controller
         //$response = Twitter::searchRecent($query, $params);
         ddd(json_decode($response));
         return JsonResponse::fromJsonString($response);
+
+        /*
+         * Some example searches:
+         * (btc OR bitcoin OR crypto) AND (from:elonmusk)
+         * 
+         * ((btc OR bitcoin OR crypto) (#btc OR #bitcoin OR #buy OR #sell)) AND from:elonmusk
+         * 
+         * ((btc OR bitcoin OR crypto OR buy OR sell) OR (#btc OR #bitcoin OR #buy OR #sell)) AND from:elonmusk
+         */
     }
 }

@@ -152,6 +152,8 @@ Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'chec
     Route::get('/market', [\App\Http\Controllers\MarketDataController::class, 'index'])->name('market.index');
     Route::get('/market/chart_data', [\App\Http\Controllers\MarketDataController::class, 'chartData'])->name('market.chart_data');
     Route::get('/market/run_arbitrage_algorithm', [\App\Http\Controllers\MarketDataController::class, 'runArbitrageAlgorithm'])->name('market.run_arbitrage_algorithm');
+    Route::get('/market/run_arbitrage_algorithm_v2', [\App\Http\Controllers\MarketDataController::class, 'runArbitrageAlgorithm_v2'])->name('market.run_arbitrage_algorithm_v2');
+
 
 });
 

@@ -178,4 +178,18 @@ class MarketDataController extends Controller
         $service = new ArbitrageAlgorithmService($dtStart, $dtEnd);
         return response()->json($service->getData($dtStart, $dtEnd, 'BTC/USDT'));
     }
+
+
+    public function runArbitrageAlgorithm_V2()
+    {
+        //Set format of xAxis depending on interval used.
+        $intervalHours = 1;
+
+        $tz = new DateTimeZone('UTC');
+        $dtStart = new DateTimeImmutable('2020-11-22 00:00:00', $tz);
+        $dtEnd = $dtStart->add(new DateInterval('PT'.$intervalHours.'H'));
+
+        $service = new ArbitrageAlgorithmService($dtStart, $dtEnd);
+        return response()->json($service->getDataV2($dtStart, $dtEnd, 'BTC/USDT'));
+    }
 }

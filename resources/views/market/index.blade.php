@@ -20,6 +20,10 @@ Market Data
                 </div>
                 <hr>
                 <a href="#" class="btn btn-primary" id="run-arbitrage">Run Arbitrage</a>
+                <p>This performs a buy and sell on competing Exchanges when the value at one exchange becomes higher or lower than the other</p>
+                <br>
+                <a href="#" class="btn btn-primary" id="run-arbitrage-v2">Run Arbitrage V2</a>
+                <p>This performs a buy and sell on competing Exchanges when the value at one exchange any time the value at the two exchanges are not equal.</p>
                 <hr>
                 <div id="run-results">
                 </div>
@@ -83,7 +87,12 @@ Market Data
 
         newPts.forEach((pt) => {
 
-            if (pt['type'] == 'buy')
+            if (pt['type'] == 'both')
+            {
+                chart.data.datasets[2].data.push(pt['buy_price']);
+                chart.data.datasets[3].data.push(pt['sell_price']);
+            }
+            else if (pt['type'] == 'buy')
             {
                 chart.data.datasets[2].data.push(pt['close_price']);
                 chart.data.datasets[3].data.push(null);
@@ -208,6 +217,41 @@ Market Data
                 var resultDiv = $('#run-results');
                 resultDiv.html(
                     '<strong>Simulation finished running</strong>'+
+                    '<p>Total profit in '+data['simulation'].currency+' is: '+data['simulation'].total_profit+'</p>'+
+                    '<p>Total profit in USDT is '+data['profit_usdt']+'</p>'
+                );
+                /*
+                //Get profit in USDT
+                $.get("{* route('simulation.get_profit') *}"+"/"+data['simulation'].id,
+                function (profit_data) {
+                    console.log('Found profit:');
+                    console.log(profit_data);
+                    //Update UI with simulation profit.
+                    console.log('Profit in USD is: $'+profit_data['profit_usdt']);
+                });
+                */
+            })
+            .fail(function () {
+                console.log("Failed to get arbitrage data");
+            });
+        });
+
+
+        //Trigger the run arbitrage V2 simulation
+        $('#run-arbitrage-v2').on('click', function (){
+            $.get("{{ route('market.run_arbitrage_algorithm_v2') }}",
+            function (data) {
+                console.log("Got arbitrage data");
+                console.log(data);
+                addDataPoints(myChart, data['data']);
+                //Update with simulation info
+                console.log('Simulation done');
+                console.log(data);
+                console.log('Simulation profit: $'+data['simulation'].total_profit);
+                console.log('Simulation profit in USDT: $'+data['profit_usdt']);
+                var resultDiv = $('#run-results');
+                resultDiv.html(
+                    '<strong>Simulation '+data['simulation'].algorithm_name+' finished running</strong>'+
                     '<p>Total profit in '+data['simulation'].currency+' is: '+data['simulation'].total_profit+'</p>'+
                     '<p>Total profit in USDT is '+data['profit_usdt']+'</p>'
                 );

@@ -111,7 +111,7 @@ class MarketDataController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function chartData(string $start_date, string $end_date, string $currency)
+    public function chartData(string $start_date, string $end_date, string $crypto_currency, string $base_currency)
     {
         $localTz = new DateTimeZone('Australia/Sydney');
         $utcTz = new DateTimeZone('UTC');
@@ -133,13 +133,15 @@ class MarketDataController extends Controller
                 break;
         }
 
-        $rows = MarketData::where('symbol', $currency)
+        $symbol = $crypto_currency.'/'.$base_currency;
+
+        $rows = MarketData::where('symbol', $symbol)
                     ->where('date', '>=', $dtStart)
                     ->where('date', '<=', $dtEnd)
                     ->where('exchange', 1)->get(); //Exchange 1 is binance
 
 
-        $rowsFTX = MarketData::where('symbol', $currency)
+        $rowsFTX = MarketData::where('symbol', $symbol)
                             ->where('date', '>=', $dtStart)
                             ->where('date', '<=', $dtEnd)
                             ->where('exchange', 2)->get(); //Exchange 2 is FTX
@@ -148,19 +150,19 @@ class MarketDataController extends Controller
         $data = [];
         //BTC is the base data series. Add others with a different key.
         //The key doubles as the series label
-        $data[$currency.' - Binance'] = [];
+        $data[$symbol.' - Binance'] = [];
         foreach ($rows as $row)
         {
             $labels[] = $row->date->format($xFormat);
-            $data[$currency.' - Binance'][] = $row->close_price;
+            $data[$symbol.' - Binance'][] = $row->close_price;
         }
 
-        $data[$currency.' - FTX'] = [];
+        $data[$symbol.' - FTX'] = [];
         foreach ($rowsFTX as $row)
         {
             //Only add labels the first time
             //$labels[] = $row->date;
-            $data[$currency.' - FTX'][] = $row->close_price;
+            $data[$symbol.' - FTX'][] = $row->close_price;
         }
 
         $val = [
@@ -172,7 +174,7 @@ class MarketDataController extends Controller
         return response()->json($val);
     }
 
-    public function runArbitrageAlgorithm(string $start_date, string $end_date, string $currency)
+    public function runArbitrageAlgorithm(string $start_date, string $end_date, string $crypto_currency, string $base_currency)
     {
         $localTz = new DateTimeZone('Australia/Sydney');
         $utcTz = new DateTimeZone('UTC');
@@ -182,12 +184,14 @@ class MarketDataController extends Controller
         $dtStart->setTimezone($utcTz);
         $dtEnd->setTimezone($utcTz);
 
+        $symbol = $crypto_currency.'/'.$base_currency;
+
         $service = new ArbitrageAlgorithmService($dtStart, $dtEnd);
-        return response()->json($service->getData($dtStart, $dtEnd, $currency));
+        return response()->json($service->getData($dtStart, $dtEnd, $symbol));
     }
 
 
-    public function runArbitrageAlgorithm_V2(string $start_date, string $end_date, string $currency)
+    public function runArbitrageAlgorithm_V2(string $start_date, string $end_date, string $crypto_currency, string $base_currency)
     {
         $localTz = new DateTimeZone('Australia/Sydney');
         $utcTz = new DateTimeZone('UTC');
@@ -196,11 +200,12 @@ class MarketDataController extends Controller
         //Convert to UTC
         $dtStart->setTimezone($utcTz);
         $dtEnd->setTimezone($utcTz);
+        $symbol = $crypto_currency.'/'.$base_currency;
 
         //Set format of xAxis depending on interval used.
         $intervalHours = floor(($dtEnd->getTimestamp() - $dtStart->getTimestamp()) / 3600);
 
         $service = new ArbitrageAlgorithmService($dtStart, $dtEnd);
-        return response()->json($service->getDataV2($dtStart, $dtEnd, $currency));
+        return response()->json($service->getDataV2($dtStart, $dtEnd, $symbol));
     }
 }

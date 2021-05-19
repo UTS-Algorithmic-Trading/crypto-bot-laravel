@@ -150,9 +150,9 @@ Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'chec
 Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'checkblocked']], function () {
 
     Route::get('/market', [\App\Http\Controllers\MarketDataController::class, 'index'])->name('market.index');
-    Route::get('/market/chart_data/{start_date}/{end_date}/{currency}', [\App\Http\Controllers\MarketDataController::class, 'chartData'])->name('market.chart_data');
-    Route::get('/market/run_arbitrage_algorithm/{start_date}/{end_date}/{currency}', [\App\Http\Controllers\MarketDataController::class, 'runArbitrageAlgorithm'])->name('market.run_arbitrage_algorithm');
-    Route::get('/market/run_arbitrage_algorithm_v2/{start_date}/{end_date}/{currency}', [\App\Http\Controllers\MarketDataController::class, 'runArbitrageAlgorithm_v2'])->name('market.run_arbitrage_algorithm_v2');
+    Route::get('/market/chart_data/{start_date}/{end_date}/{crypto_currency}/{base_currency}', [\App\Http\Controllers\MarketDataController::class, 'chartData'])->name('market.chart_data');
+    Route::get('/market/run_arbitrage_algorithm/{start_date}/{end_date}/{crypto_currency}/{base_currency}', [\App\Http\Controllers\MarketDataController::class, 'runArbitrageAlgorithm'])->name('market.run_arbitrage_algorithm');
+    Route::get('/market/run_arbitrage_algorithm_v2/{start_date}/{end_date}/{crypto_currency}/{base_currency}', [\App\Http\Controllers\MarketDataController::class, 'runArbitrageAlgorithm_v2'])->name('market.run_arbitrage_algorithm_v2');
 
 
 });

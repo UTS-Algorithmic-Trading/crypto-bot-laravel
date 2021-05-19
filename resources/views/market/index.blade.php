@@ -23,7 +23,7 @@ Market Data
                     <input type="text" id="end_date" class="form-control" value="2020-11-22 11:00:00" />
                 </div>
                 <div class="mb-3">
-                    <label for="currency_selector" class="form_label">End Date</label>
+                    <label for="currency_selector" class="form_label">Currency</label>
                     <select id="currency_selector" class="form-control">
                         <option value="BTC/USDT" selected="selected">Bitcoin</option>
                         <option value="ETH/USDT">Ethereum</option>
@@ -204,7 +204,8 @@ Market Data
             console.log('Start Date: '+startDate);
             console.log('End Date: '+endDate);
             console.log('Currency: '+currency);
-            $.get("http://crypto.local/market/chart_data/"+encodeURIComponent(startDate)+"/"+encodeURIComponent(endDate)+"/"+encodeURIComponent(currency), 
+            //Currency is in format of BTC/USDT which will split to two parameters in the URL when being passed in the AJAX request.
+            $.get("http://crypto.local/market/chart_data/"+encodeURIComponent(startDate)+"/"+encodeURIComponent(endDate)+"/"+currency, 
             //Data returned:
             function (data) {
                 console.log('Got new chart data');

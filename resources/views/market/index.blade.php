@@ -252,7 +252,7 @@ Market Data
 
         //Trigger the run arbitrage simulation
         $('#run-arbitrage').on('click', function (){
-            $.get("http://crypto.local/market/run_arbitrage_algorithm/"+startDate+"/"+endDate+"/"+currency,
+            $.get("http://crypto.local/market/run_arbitrage_algorithm/"+encodeURIComponent(startDate.val())+"/"+encodeURIComponent(endDate.val())+"/"+currency.val(),
             function (data) {
                 console.log("Got arbitrage data");
                 console.log(data);
@@ -287,7 +287,7 @@ Market Data
 
         //Trigger the run arbitrage V2 simulation
         $('#run-arbitrage-v2').on('click', function (){
-            $.get("http://crypto.local/market/run_arbitrage_algorithm_v2/"+startDate+"/"+endDate+"/"+currency,
+            $.get("http://crypto.local/market/run_arbitrage_algorithm_v2/"+encodeURIComponent(startDate.val())+"/"+encodeURIComponent(endDate.val())+"/"+currency.val(),
             function (data) {
                 console.log("Got arbitrage data");
                 console.log(data);

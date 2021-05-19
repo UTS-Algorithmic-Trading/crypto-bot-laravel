@@ -136,9 +136,9 @@ Market Data
     function removeData(chart) {
         chart.clear();
         console.log("Removing data...");
-        chart.data.labels.pop();
+        chart.data.labels = [];
         chart.data.datasets.forEach((dataset) => {
-            dataset.data.pop();
+            dataset.data = [];
         });
         chart.update();
     }
@@ -223,12 +223,32 @@ Market Data
             });
         }
 
-        var startDate = $('#start_date').val();
-        var endDate = $('#end_date').val();
-        var currency = $('#currency_selector').val();
+        var startDate = $('#start_date');
+        var endDate = $('#end_date');
+        var currency = $('#currency_selector');
 
         //Update chart on page load
-        updateChart(startDate, endDate, currency);
+        updateChart(startDate.val(), endDate.val(), currency.val());
+
+        //Also update on currency or date change.
+        currency.on('change', function ()
+        {
+            removeData(myChart);
+            updateChart(startDate.val(), endDate.val(), currency.val());
+        });
+
+        startDate.on('change', function ()
+        {
+            removeData(myChart);
+            updateChart(startDate.val(), endDate.val(), currency.val());
+        });
+
+        endDate.on('change', function ()
+        {
+            removeData(myChart);
+            updateChart(startDate.val(), endDate.val(), currency.val());
+        });
+
 
         //Trigger the run arbitrage simulation
         $('#run-arbitrage').on('click', function (){

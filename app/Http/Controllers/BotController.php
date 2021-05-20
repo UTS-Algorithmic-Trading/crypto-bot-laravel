@@ -135,6 +135,7 @@ class BotController extends Controller
 
     public function searchRecent(string $query)
     {
+        
         $params = [
             'place.fields' => 'country,name',
             'tweet.fields' => 'author_id,geo',
@@ -145,9 +146,35 @@ class BotController extends Controller
         $user_response = json_decode(Twitter::getUserByUsername("elonmusk", []));
         //ddd($user_response);
 
-        $response = Twitter::userTweets($user_response->data->id, []);
-        //$response = Twitter::searchRecent($query, $params);
-        ddd(json_decode($response));
+        $results = [];
+        $response = "";
+        $next = "";
+
+        do {
+            $params = [];
+            if ($next)
+                $params['pagination_token'] = $next;
+
+            $response = json_decode(Twitter::userTweets($user_response->data->id, $params));
+
+            //ddd($response);
+
+            if (!$response || !isset($response->data))
+                break;
+
+            foreach ($response->data as $tweet)
+                $results[] = $tweet;
+
+            if (isset($response->meta) && isset($response->meta->next_token))
+                $next = $response->meta->next_token;
+            else
+                $next = "";
+
+            //$response = Twitter::searchRecent($query, $params);
+        } while ($next);
+
+        ddd($results);
+
         return JsonResponse::fromJsonString($response);
 
         /*

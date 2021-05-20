@@ -81,7 +81,7 @@ class MarketDataImport implements ToModel, WithValidation, WithBatchInserts, Wit
             ],
             '2'   => [
                 'required', 'min:3', 'max:20',
-                'in:BTC/USDT,ETH/USDT',
+                'in:BTC/USDT,ETH/USDT,XRP/USDT',
             ],
             '3'  => 'required|numeric|between:0,1000000',
             '4'  => 'required|numeric|between:0,1000000',

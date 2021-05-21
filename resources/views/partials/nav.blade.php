@@ -58,9 +58,6 @@
                         </div>
                     </li>
                 @endrole
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('bots.index')}}">Bots</a>
-                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Market
@@ -77,6 +74,13 @@
                         @endrole
                     </div>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('bots.index')}}">Bots</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('tweets.summary')}}">Tweets</a>
+                </li>
+
             </ul>
             {{-- Right Side Of Navbar --}}
             <ul class="navbar-nav ml-auto">

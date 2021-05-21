@@ -143,5 +143,7 @@
 
         @yield('footer_scripts')
 
+        <div class="modal"><!-- AJAX spinner modal --></div>
+
     </body>
 </html>

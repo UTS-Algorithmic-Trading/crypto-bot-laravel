@@ -145,6 +145,7 @@ Market Data
 
     //Begin update
     $(document).ready(function () {
+        var body = $('body');
         var ctx = document.getElementById('marketChart');
         var myChart = new Chart(ctx, {
             type: 'line',
@@ -233,27 +234,37 @@ Market Data
         //Also update on currency or date change.
         currency.on('change', function ()
         {
+            body.addClass("loading");
+            console.log('Body is');
+            console.log($('body'));
             removeData(myChart);
             updateChart(startDate.val(), endDate.val(), currency.val());
+            body.removeClass("loading");
         });
 
         startDate.on('change', function ()
         {
+            body.addClass("loading");
             removeData(myChart);
             updateChart(startDate.val(), endDate.val(), currency.val());
+            body.removeClass("loading");
         });
 
         endDate.on('change', function ()
         {
+            body.addClass("loading");
             removeData(myChart);
             updateChart(startDate.val(), endDate.val(), currency.val());
+            body.removeClass("loading");
         });
 
 
         //Trigger the run arbitrage simulation
         $('#run-arbitrage').on('click', function (){
+            body.addClass("loading");
             $.get("http://crypto.local/market/run_arbitrage_algorithm/"+encodeURIComponent(startDate.val())+"/"+encodeURIComponent(endDate.val())+"/"+currency.val(),
             function (data) {
+                body.removeClass("loading");
                 console.log("Got arbitrage data");
                 console.log(data);
                 addDataPoints(myChart, data['data']);
@@ -282,13 +293,16 @@ Market Data
             .fail(function () {
                 console.log("Failed to get arbitrage data");
             });
+            body.removeClass("loading");
         });
 
 
         //Trigger the run arbitrage V2 simulation
         $('#run-arbitrage-v2').on('click', function (){
+            body.addClass("loading");
             $.get("http://crypto.local/market/run_arbitrage_algorithm_v2/"+encodeURIComponent(startDate.val())+"/"+encodeURIComponent(endDate.val())+"/"+currency.val(),
             function (data) {
+                body.removeClass("loading");
                 console.log("Got arbitrage data");
                 console.log(data);
                 addDataPoints(myChart, data['data']);
@@ -317,6 +331,7 @@ Market Data
             .fail(function () {
                 console.log("Failed to get arbitrage data");
             });
+            body.removeClass("loading");
         });
     });
 </script>

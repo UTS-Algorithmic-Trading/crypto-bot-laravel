@@ -73,12 +73,15 @@
                 <div class="mb-3">
                     <label for="currency_selector" class="form_label">Currency</label>
                     <select id="currency_selector" class="form-control">
-                        <option value="BTC/USDT" selected="selected">Bitcoin</option>
-                        <option value="ETH/USDT">Ethereum</option>
-                        <option value="XRP/USDT">XRP</option>
+                        <option value="BTC" selected="selected">Bitcoin</option>
+                        <option value="ETH">Ethereum</option>
+                        <option value="XRP">XRP</option>
                     </select>
                 </div>
-                <a href="#" class="btn btn-primary" id="run-arbitrage">Synchronise Tweets</a>
+                <a href="#" class="btn btn-primary" id="sync-tweets">Synchronise Tweets</a>
+                <br>
+                <br>
+                <div id="sync-result"></div>
             </div>
         </div>
     </div>
@@ -106,6 +109,32 @@
             }
             el.toggle(400);
             e.preventDefault();
+        });
+
+        $('#sync-tweets').on('click', function (e) {
+            e.preventDefault();
+            console.log('Syncing tweets');
+            $('body').addClass("loading");
+            $.get("http://crypto.local/tweets/sync/"+encodeURIComponent($('#currency_selector').val()), function (data) {
+                console.log('Finished sync');
+                console.log(data);
+                $('#sync-result').html(
+                    '<div class="alert alert-success" role="alert">'+
+                    '<strong>Sync finished!</strong>'+
+                    '<ul>'+
+                    '<li>New tweets: '+data.new_tweet_count+'</li>'+
+                    '<li>Rated relevant tweets: '+data.nlp_rated_count+'</li>'+
+                    '</div>'  
+                );
+            })
+            .fail(function () {
+                $('#sync-result').html(
+                    '<div class="alert alert-danger" role="alert">'+
+                    '<strong>Sync failed!</strong>'+
+                    '</div>'
+                );
+            });
+            $('body').removeClass("loading");
         });
     });
 

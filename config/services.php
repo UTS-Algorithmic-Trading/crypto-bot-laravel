@@ -90,7 +90,7 @@ return [
     ],
 
     'google_cloud' => [
-        'key_file' => storage_path('app/'.env('GOOGLE_APPLICATION_CREDENTIALS')),
-        'project_name' => env('GOOGLE_CLOUD_PROJECT'),
+        'key_file' => storage_path('app/'.env('GOOGLE_APPLICATION_CREDENTIALS_PATH')),
+        'project_name' => env('GOOGLE_CLOUD_PROJECT_NAME'),
     ],
 ];

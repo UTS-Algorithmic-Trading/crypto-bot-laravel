@@ -175,4 +175,60 @@ class TwitterFeedServiceProvider extends ServiceProvider
         return $tweets_added;
 
     }
+
+    private function _scoreRating($score)
+    {
+        $rating = '';
+
+        if ($score == 0)
+            $rating = 'neutral';
+        else if ($score > 0.5)
+            $rating = 'highly positive';
+        else if ($score > 0)
+            $rating = 'positive';
+        else if ($score < -0.5)
+            $rating = 'very negative';
+        else if ($score < 0)
+            $rating = 'negative';
+
+        return $rating;
+    }
+
+    public function getSentiment()
+    {
+        //Find all tweets where NLP not null and keywords match in date range.
+        //Find avg sentiment.
+
+        $keys = ['BTC', 'ETH'];
+        $sentiment = [];
+        foreach ($keys as $k)
+        {
+            Log::info("-- Score for: ".$k."\n");
+            $tweets = Tweets::relatedTweets($k)->whereNotNull('nlp_sentiment')->get();
+            $score = 0;
+            $count = 0;
+            $scores = [];
+
+            bcscale(4);
+
+            foreach ($tweets as $t)
+            {
+                $count++;
+                $score = bcadd($score, $t->nlp_sentiment);
+                $scores[] = ['tweet' => $t->text, 'sentiment' => $t->nlp_sentiment];
+                Log::info("Score: ".$score."\n");
+            }
+
+            $average = bcdiv($score, $count);
+            
+            $sentiment[$k] = [
+                'total' => $score,
+                'rating' => $this->_scoreRating($average),
+                'average' => $average,
+                'count' => $count,
+                'scores' => $scores,
+            ];
+        }
+        return $sentiment;        
+    }
 }

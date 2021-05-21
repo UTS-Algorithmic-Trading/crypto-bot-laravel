@@ -37,6 +37,12 @@ class SocialSentimentServiceProvider extends ServiceProvider
             'projectId' => config('services.google_cloud.project_name'),
         ]);
 
+        //ENV must be set: https://cloud.google.com/document-ai/docs/error-messages
+        putenv('GOOGLE_APPLICATION_CREDENTIALS='.config('services.google_cloud.key_file'));
+        putenv('GOOGLE_CLOUD_PROJECT_NAME='.config('services.google_cloud.project_name'));
+
+        //ddd(env('GOOGLE_APPLICATION_CREDENTIALS'));
+
         //Get an instance of the language class, uising the authenticated ServiceBuilder.
         //See: https://www.chowles.com/sentiment-analysis-using-laravel-and-google-natural-language-api/
         //I couldn't find any other way of referencing the ServiceBuilder.
@@ -44,7 +50,7 @@ class SocialSentimentServiceProvider extends ServiceProvider
         $language = $cloud->language();
 
         // Analyze a sentence.
-        $annotation = $language->analyzeSentiment($text);
+        $annotation = $language->analyzeSentiment(html_entity_decode($text));
         return $annotation->sentiment();
     }
 }

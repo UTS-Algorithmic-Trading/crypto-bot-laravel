@@ -12,8 +12,15 @@
     <div class="container">
         <div class="row">
             <div class="col-12 col-lg-10 offset-lg-1">
+                <h2>Social Sentiment Rating</h2>
                 <p>Use this page to see the current or historical sentiment of social media towards a given currency. This can indicate whether you should buy or sell. Or take a more or less aggressive approach.</p>
-                
+                <h3>Authors</h3>
+                <p>You are following these twitter users:</p>
+                <ul>
+                @foreach ($authors as $author)
+                    <li><a href="https://twitter.com/{{ $author->screen_name }}">{{ '@'.$author->screen_name }}</a> - {{ $author->name }}</li>
+                @endforeach
+                </ul>
                 <table class="table">
                     @foreach ($sentiment as $currency => $data)
                     <thead>

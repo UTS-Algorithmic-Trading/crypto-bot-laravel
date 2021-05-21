@@ -140,9 +140,11 @@ class TweetsController extends Controller
     public function summary()
     {
         $sentiment = $this->twitterService->getSentiment();
+        $authors = $this->twitterService->getAuthors();
 
         return view('tweets.summary', [
             'sentiment' => $sentiment,
+            'authors' => $authors,
         ]);
     }
 

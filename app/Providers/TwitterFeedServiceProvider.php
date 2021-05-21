@@ -187,7 +187,7 @@ class TwitterFeedServiceProvider extends ServiceProvider
         else if ($score > 0)
             $rating = 'positive';
         else if ($score < -0.5)
-            $rating = 'very negative';
+            $rating = 'highly negative';
         else if ($score < 0)
             $rating = 'negative';
 
@@ -220,7 +220,7 @@ class TwitterFeedServiceProvider extends ServiceProvider
             }
 
             $average = bcdiv($score, $count);
-            
+
             $sentiment[$k] = [
                 'total' => $score,
                 'rating' => $this->_scoreRating($average),

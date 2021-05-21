@@ -2,7 +2,7 @@
 
 return [
 
-    'app'               => 'Laravel',
+    'app'               => 'Crypto Bot',
     'app2'              => 'Auth :version',
     'home'              => 'Home',
     'login'             => 'Login',

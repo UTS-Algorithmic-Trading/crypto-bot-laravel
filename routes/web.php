@@ -18,7 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage Route
 Route::group(['middleware' => ['web', 'checkblocked']], function () {
-    Route::get('/', 'App\Http\Controllers\WelcomeController@welcome')->name('welcome');
+    //Route::get('/', 'App\Http\Controllers\WelcomeController@welcome')->name('welcome');
+    Route::get('/', ['as' => 'public.home',   'uses' => 'App\Http\Controllers\UserController@index']);
     Route::get('/terms', 'App\Http\Controllers\TermsController@terms')->name('terms');
 });
 

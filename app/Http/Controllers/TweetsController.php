@@ -9,6 +9,15 @@ use Illuminate\Http\Request;
 
 class TweetsController extends Controller
 {
+    private $twitterService;
+    private $nlpService;
+
+    public function __construct(TwitterFeedServiceProvider $twitter, SocialSentimentServiceProvider $nlp)
+    {
+        $this->twitterService = $twitter;
+        $this->nlpService = $nlp;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -87,9 +96,6 @@ class TweetsController extends Controller
 
     public function sync($symbol)
     {
-        $twitter = new TwitterFeedServiceProvider();
-        $nlp = new SocialSentimentServiceProvider();
-
         if (strpos($symbol, '/') !== FALSE)
         {
             $parts = explode('/', $symbol);
@@ -101,23 +107,23 @@ class TweetsController extends Controller
         }
         Log::info('Syncing tweets and doing NLP for currency: '.$currency);
 
-        $authors = $twitter->getAuthors();
+        $authors = $this->twitter->getAuthors();
 
         foreach ($authors as $author)
         {
             //First update the list of tweets.
             Log::info('Syncing tweets for author: '.$author->screen_name);
-            $new_tweet_count = $twitter->getUserTweets($author->author_id);
+            $new_tweet_count = $this->twitter->getUserTweets($author->author_id);
             Log::info('Synced '.$new_tweet_count.' new tweets.');
         }
 
         //Now find any tweets that have not been rated.
-        $tweets = $twitter->getUnratedTweets($currency)->get();
+        $tweets = $this->twitter->getUnratedTweets($currency)->get();
 
         $nlp_rated_count = 0;
         foreach ($tweets as $tweet)
         {
-            $sentiment = $nlp->getSentiment($tweet->text);
+            $sentiment = $this->nlp->getSentiment($tweet->text);
             Log::info('Found sentiment of '.$sentiment['score'].' for text '.$tweet->text);
             $tweet->nlp_sentiment = $sentiment['score'];
             $tweet->update();
@@ -144,13 +150,12 @@ class TweetsController extends Controller
     {
         //Find all tweets where NLP not null and keywords match in date range.
         //Find avg sentiment.
-        $twitter = new TwitterFeedServiceProvider();
 
         $keys = ['BTC', 'ETH'];
         $sentiment = [];
         foreach ($keys as $k)
         {
-            $tweets = $twitter->getRelatedTweets($k)->whereNotNull('nlp_sentiment')->get();
+            $tweets = $this->twitter->getRelatedTweets($k)->whereNotNull('nlp_sentiment')->get();
             $score = 0;
             $count = 0;
             foreach ($tweets as $t)
@@ -164,7 +169,7 @@ class TweetsController extends Controller
                 'count' => $count,
             ];
         }
-        
+
         return response()->json($sentiment);
     }
 }

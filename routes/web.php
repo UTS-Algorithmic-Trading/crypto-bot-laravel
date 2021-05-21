@@ -171,3 +171,11 @@ Route::group(['middleware' => ['auth', 'activated', 'role:admin', 'activity', 't
 
     Route::get('/simulation/get_profit/{simulation}', [\App\Http\Controllers\SimulationController::class, 'get_profit'])->name('simulation.get_profit');
 });
+
+// Tweets - Social sentiment
+Route::group(['middleware' => ['auth', 'activated', 'role:admin', 'activity', 'twostep', 'checkblocked']], function () {
+
+    Route::get('/tweets/summary', [\App\Http\Controllers\TweetsController::class, 'summary'])->name('tweets.summary');
+    Route::get('/tweets/sync/{symbol}', [\App\Http\Controllers\TweetsController::class, 'sync'])->name('tweets.sync');
+    Route::get('/tweets/get_sentiment', [\App\Http\Controllers\TweetsController::class, 'get_sentiment'])->name('tweets.get_sentiment');
+});

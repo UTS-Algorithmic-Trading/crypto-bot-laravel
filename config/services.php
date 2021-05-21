@@ -89,4 +89,8 @@ return [
         'redirect'      => env('LINKEDIN_REDIRECT_URI'),
     ],
 
+    'google_cloud' => [
+        'key_file' => storage_path('app/'.env('GOOGLE_APPLICATION_CREDENTIALS')),
+        'project_name' => env('GOOGLE_CLOUD_PROJECT'),
+    ],
 ];

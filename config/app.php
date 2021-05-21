@@ -178,6 +178,8 @@ return [
         \SocialiteProviders\Manager\ServiceProvider::class,
         //Load custom services per algorithm.
         App\Providers\ArbitrageAlgorithmService::class,
+        App\Providers\TwitterFeedServiceProvider::class,
+        App\Providers\SocialSentimentServiceProvider::class,
     ],
 
     /*

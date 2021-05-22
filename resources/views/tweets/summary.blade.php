@@ -125,6 +125,7 @@
             $.get("http://crypto.local/tweets/sync/"+encodeURIComponent($('#currency_selector').val()), function (data) {
                 console.log('Finished sync');
                 console.log(data);
+                $('body').removeClass("loading");
                 $('#sync-result').html(
                     '<div class="alert alert-success" role="alert">'+
                     '<strong>Sync finished!</strong>'+
@@ -135,13 +136,13 @@
                 );
             })
             .fail(function () {
+                $('body').removeClass("loading");
                 $('#sync-result').html(
                     '<div class="alert alert-danger" role="alert">'+
                     '<strong>Sync failed!</strong>'+
                     '</div>'
                 );
             });
-            $('body').removeClass("loading");
         });
     });
 

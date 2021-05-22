@@ -201,6 +201,7 @@ Market Data
 
         function updateChart(startDate, endDate, currency)
         {
+            body.addClass("loading");
             console.log('Updating Chart with data');
             console.log('Start Date: '+startDate);
             console.log('End Date: '+endDate);
@@ -213,6 +214,7 @@ Market Data
                 console.log(data);
                 console.log(data.data[currency+" - FTX"]);
                 updateData(myChart, data.labels, data.data, currency);
+                body.removeClass("loading");
             })
             //Success:
             .done(function () {
@@ -221,6 +223,7 @@ Market Data
             //Failure:
             .fail(function () {
                 console.log("Request for market data failed");
+                body.removeClass("loading");
             });
         }
 
@@ -239,7 +242,6 @@ Market Data
             console.log($('body'));
             removeData(myChart);
             updateChart(startDate.val(), endDate.val(), currency.val());
-            body.removeClass("loading");
         });
 
         startDate.on('change', function ()
@@ -247,7 +249,6 @@ Market Data
             body.addClass("loading");
             removeData(myChart);
             updateChart(startDate.val(), endDate.val(), currency.val());
-            body.removeClass("loading");
         });
 
         endDate.on('change', function ()
@@ -255,7 +256,6 @@ Market Data
             body.addClass("loading");
             removeData(myChart);
             updateChart(startDate.val(), endDate.val(), currency.val());
-            body.removeClass("loading");
         });
 
 
@@ -292,8 +292,8 @@ Market Data
             })
             .fail(function () {
                 console.log("Failed to get arbitrage data");
+                body.removeClass("loading");
             });
-            body.removeClass("loading");
         });
 
 
@@ -330,8 +330,8 @@ Market Data
             })
             .fail(function () {
                 console.log("Failed to get arbitrage data");
+                body.removeClass("loading");
             });
-            body.removeClass("loading");
         });
     });
 </script>

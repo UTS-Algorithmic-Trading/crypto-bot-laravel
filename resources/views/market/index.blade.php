@@ -207,7 +207,7 @@ Market Data
             console.log('End Date: '+endDate);
             console.log('Currency: '+currency);
             //Currency is in format of BTC/USDT which will split to two parameters in the URL when being passed in the AJAX request.
-            $.get("http://crypto.local/market/chart_data/"+encodeURIComponent(startDate)+"/"+encodeURIComponent(endDate)+"/"+currency, 
+            $.get("https://crypto.rh.ys.id.au/market/chart_data/"+encodeURIComponent(startDate)+"/"+encodeURIComponent(endDate)+"/"+currency, 
             //Data returned:
             function (data) {
                 console.log('Got new chart data');
@@ -262,7 +262,7 @@ Market Data
         //Trigger the run arbitrage simulation
         $('#run-arbitrage').on('click', function (){
             body.addClass("loading");
-            $.get("http://crypto.local/market/run_arbitrage_algorithm/"+encodeURIComponent(startDate.val())+"/"+encodeURIComponent(endDate.val())+"/"+currency.val(),
+            $.get("https://crypto.rh.ys.id.au/market/run_arbitrage_algorithm/"+encodeURIComponent(startDate.val())+"/"+encodeURIComponent(endDate.val())+"/"+currency.val(),
             function (data) {
                 body.removeClass("loading");
                 console.log("Got arbitrage data");
@@ -300,7 +300,7 @@ Market Data
         //Trigger the run arbitrage V2 simulation
         $('#run-arbitrage-v2').on('click', function (){
             body.addClass("loading");
-            $.get("http://crypto.local/market/run_arbitrage_algorithm_v2/"+encodeURIComponent(startDate.val())+"/"+encodeURIComponent(endDate.val())+"/"+currency.val(),
+            $.get("https://crypto.rh.ys.id.au/market/run_arbitrage_algorithm_v2/"+encodeURIComponent(startDate.val())+"/"+encodeURIComponent(endDate.val())+"/"+currency.val(),
             function (data) {
                 body.removeClass("loading");
                 console.log("Got arbitrage data");

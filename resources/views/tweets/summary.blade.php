@@ -122,7 +122,7 @@
             e.preventDefault();
             console.log('Syncing tweets');
             $('body').addClass("loading");
-            $.get("http://crypto.local/tweets/sync/"+encodeURIComponent($('#currency_selector').val()), function (data) {
+            $.get("https://crypto.rh.ys.id.au/tweets/sync/"+encodeURIComponent($('#currency_selector').val()), function (data) {
                 console.log('Finished sync');
                 console.log(data);
                 $('body').removeClass("loading");
